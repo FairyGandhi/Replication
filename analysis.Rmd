@@ -1,6 +1,8 @@
 ---
-title: "analysis"
-output: html_document
+title: "Hypothesis testing"
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -20,16 +22,65 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+```{r data upload}
+data <- read.csv("C:\\Users\\fairy\\Desktop\\Replication\\Final_data_hypothesis_testing.csv")
+head(data)
 ```
 
 ## Including Plots
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r }
+str(data)
+```
+```{r logistic regression}
+model <- glm(WTP ~ FEATURE + THPARTY + PROFFER + ORDPREF + 
+                   RISKBEH + RISKPERC + LSLFCONF + MOBBEH + 
+                   OWNEXP + OTHEXP + HEAREXP + AGE + INCOME + 
+                   GENDER + HomeExpDum + MedRecDum, 
+                   data = data, family = "binomial")
+summary(model)
+```
+The estimates for the binary logit model are shown above for All Features. First, the results show that the estimate of the log odds of FEATURE = Security (since Usability is the reference group) is positive (0.836) and significant (p < 0.001) implying that the respondents were significantly more willing to pay for a security feature compared to a usability feature (H1 is *NOT* supported).
+
+Because the estimates (above) measure log odds of WTP = 1 for the binary variable FEATURE, the odds ratio for the WTP for a Security feature versus WTP for a Usability feature can be computed from the estimate. The estimate is +0.836, from which we can calculate the odds ratio to be 2.3131189, implying that an individual is about 83% more likely to be willing to pay for security than for usability. Thus, we do *not* find strong support for our hypotheses that mobile app users are more willing to pay for usability features than for security features.
+
+
+```{r }
+exp(coef(model))
+```
+We discuss the impact of third-party certification on the WTP for security features below with the analysis of security features only. We separate the analyses because variables such as third-party certification, risk perceptions and attitudes, self-confidence, etc., are expected to influence an individual’s WTP for security features only.
+
+To focus on the effects of the third-party certification as well as risk perceptions of individuals on the WTP for security, equation for logistic regression is modified (as shown below) to apply to security features (FEATURE is removed). Here, FEATURE is no longer needed.
+
+```{r }
+# filter to just security features == 1
+security_feature_data = data %>% filter(FEATURE == 1) %>% select(-FEATURE)
+security_feature_data %>% head()
+
+head(security_feature_data)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r }
+#Logistic regression on security features
+#Logistic regression
+#FEATURE excluded
+model_security <- glm(WTP ~ + THPARTY + PROFFER + ORDPREF + 
+                      RISKBEH + RISKPERC + LSLFCONF + MOBBEH + 
+                      OWNEXP + OTHEXP + HEAREXP + AGE + INCOME + 
+                      GENDER + HomeExpDum + MedRecDum, 
+                      data = security_feature_data, family = "binomial")
+``` 
+
+
+
+```{r }
+summary(model_security)
+```
+The estimates for the binary logit model are shown above for only Security Features. First, the results show that THPARTY (THPARTY = NO was used as the reference category) is *NOT* significant, which indicates that third-party certification did NOT increase the WTP for security (H2 is *NOT* supported).
+
+```{r}
+exp(coef(model_security))
+```
