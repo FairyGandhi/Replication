@@ -183,10 +183,16 @@ library(dplyr)</code></pre>
 <pre><code>## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>install.packages(&quot;emmeans&quot;)</code></pre>
+<pre><code>## Installing emmeans [1.7.3] ...
+##  OK [linked cache]</code></pre>
+<pre class="r"><code>install.packages(&quot;magrittr&quot;)</code></pre>
+<pre><code>## Installing magrittr [2.0.3] ...
+##  OK [linked cache]</code></pre>
+<pre class="r"><code>library(emmeans)
+library(magrittr)</code></pre>
 <div id="r-markdown" class="section level2">
 <h2>R Markdown</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
 <pre class="r"><code>data &lt;- read.csv(&quot;C:\\Users\\fairy\\Desktop\\Replication\\Final_data_hypothesis_testing.csv&quot;)
 head(data)</code></pre>
 <pre><code>##   Index User Scenario FEATURE THPARTY WTP ORDPREF PROFFER AGE GENDER INCOME
@@ -210,10 +216,6 @@ head(data)</code></pre>
 ## 4      0
 ## 5      0
 ## 6      1</code></pre>
-</div>
-<div id="including-plots" class="section level2">
-<h2>Including Plots</h2>
-<p>You can also embed plots, for example:</p>
 <pre class="r"><code>str(data)</code></pre>
 <pre><code>## &#39;data.frame&#39;:    13920 obs. of  21 variables:
 ##  $ Index     : int  0 1 2 3 4 5 6 7 8 9 ...
@@ -237,6 +239,7 @@ head(data)</code></pre>
 ##  $ HomeExpDum: int  0 0 0 0 0 0 0 0 1 0 ...
 ##  $ MedRecDum : int  0 0 1 1 1 0 1 1 0 0 ...
 ##  $ PwdDum    : int  1 1 0 0 0 1 0 0 0 1 ...</code></pre>
+<p>Logistic Regression is a Machine Learning classification algorithm that is used to predict the probability of a categorical dependent variable. It is an extension of the linear regression model for classification problems.</p>
 <pre class="r"><code>model &lt;- glm(WTP ~ FEATURE + THPARTY + PROFFER + ORDPREF + 
                    RISKBEH + RISKPERC + LSLFCONF + MOBBEH + 
                    OWNEXP + OTHEXP + HEAREXP + AGE + INCOME + 
@@ -283,54 +286,18 @@ summary(model)</code></pre>
 ## AIC: 18712
 ## 
 ## Number of Fisher Scoring iterations: 4</code></pre>
-<p>The estimates for the binary logit model are shown above for All Features. First, the results show that the estimate of the log odds of FEATURE = Security (since Usability is the reference group) is positive (0.836) and significant (p &lt; 0.001) implying that the respondents were significantly more willing to pay for a security feature compared to a usability feature (H1 is NOT supported).</p>
-<p>Because the estimates (above) measure log odds of WTP = 1 for the binary variable FEATURE, the odds ratio for the WTP for a Security feature versus WTP for a Usability feature can be computed from the estimate. The estimate is +0.836, from which we can calculate the odds ratio to be 2.3131189, implying that an individual is about 83% more likely to be willing to pay for security than for usability. Thus, we do not find strong support for our hypotheses that mobile app users are more willing to pay for usability features than for security features.</p>
-<pre class="r"><code>model &lt;- glm(WTP ~ FEATURE + THPARTY + PROFFER + ORDPREF + 
-                   RISKBEH + RISKPERC + LSLFCONF + MOBBEH + 
-                   OWNEXP + OTHEXP + HEAREXP + AGE + INCOME + 
-                   GENDER + HomeExpDum + MedRecDum, 
-                   data = data, family = &quot;binomial&quot;)
-summary(model)</code></pre>
-<pre><code>## 
-## Call:
-## glm(formula = WTP ~ FEATURE + THPARTY + PROFFER + ORDPREF + RISKBEH + 
-##     RISKPERC + LSLFCONF + MOBBEH + OWNEXP + OTHEXP + HEAREXP + 
-##     AGE + INCOME + GENDER + HomeExpDum + MedRecDum, family = &quot;binomial&quot;, 
-##     data = data)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -1.4368  -1.0199  -0.9375   1.0442   1.4668  
-## 
-## Coefficients:
-##               Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept) -5.176e-01  1.315e-01  -3.936 8.29e-05 ***
-## FEATURE      8.386e-01  3.468e-02  24.180  &lt; 2e-16 ***
-## THPARTY     -3.805e-02  3.470e-02  -1.096   0.2729    
-## PROFFER      1.929e-03  2.013e-02   0.096   0.9237    
-## ORDPREF      8.669e-02  3.563e-02   2.433   0.0150 *  
-## RISKBEH      9.684e-04  8.688e-03   0.111   0.9112    
-## RISKPERC     3.139e-03  9.324e-03   0.337   0.7363    
-## LSLFCONF    -3.637e-02  2.158e-02  -1.686   0.0919 .  
-## MOBBEH       1.444e-03  8.699e-03   0.166   0.8682    
-## OWNEXP       1.167e-02  2.170e-02   0.538   0.5909    
-## OTHEXP      -1.183e-02  2.132e-02  -0.555   0.5791    
-## HEAREXP     -5.916e-03  2.151e-02  -0.275   0.7833    
-## AGE          2.968e-03  1.281e-03   2.316   0.0205 *  
-## INCOME       1.515e-08  3.347e-07   0.045   0.9639    
-## GENDER       5.275e-03  3.512e-02   0.150   0.8806    
-## HomeExpDum  -5.779e-03  4.249e-02  -0.136   0.8918    
-## MedRecDum   -5.648e-02  4.249e-02  -1.329   0.1838    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 19294  on 13919  degrees of freedom
-## Residual deviance: 18678  on 13903  degrees of freedom
-## AIC: 18712
-## 
-## Number of Fisher Scoring iterations: 4</code></pre>
+<p><em>H1: Users of mobile applications are more willing to pay for usability features than for security features</em></p>
+<p>The estimates for the binary logit model are shown above for All Features. First, the results show that the estimate of the log odds of FEATURE = Security (since Usability is the reference group) is positive (0.836) and significant (p &lt; 0.001) implying that the respondents were significantly more willing to pay for a security feature compared to a usability feature (H1 is <em>NOT</em> supported).</p>
+<p>Because the estimates (above) measure log odds of WTP = 1 for the binary variable FEATURE, the odds ratio for the WTP for a Security feature versus WTP for a Usability feature can be computed from the estimate. The estimate is +0.836, from which we can calculate the odds ratio to be 2.3131189, implying that an individual is about 83% more likely to be willing to pay for security than for usability. Thus, we do <em>not</em> find strong support for our hypotheses that mobile app users are more willing to pay for usability features than for security features.</p>
+<pre class="r"><code>exp(coef(model))</code></pre>
+<pre><code>## (Intercept)     FEATURE     THPARTY     PROFFER     ORDPREF     RISKBEH 
+##   0.5959341   2.3131189   0.9626695   1.0019312   1.0905547   1.0009689 
+##    RISKPERC    LSLFCONF      MOBBEH      OWNEXP      OTHEXP     HEAREXP 
+##   1.0031441   0.9642825   1.0014450   1.0117356   0.9882403   0.9941010 
+##         AGE      INCOME      GENDER  HomeExpDum   MedRecDum 
+##   1.0029723   1.0000000   1.0052888   0.9942375   0.9450879</code></pre>
+<p>We discuss the impact of third-party certification on the WTP for security features below with the analysis of security features only. We separate the analyses because variables such as third-party certification, risk perceptions and attitudes, self-confidence, etc., are expected to influence an individual’s WTP for security features only.</p>
+<p>To focus on the effects of the third-party certification as well as risk perceptions of individuals on the WTP for security, equation for logistic regression is modified (as shown below) to apply to security features (FEATURE is removed). Here, FEATURE is no longer needed.</p>
 <pre class="r"><code># filter to just security features == 1
 security_feature_data = data %&gt;% filter(FEATURE == 1) %&gt;% select(-FEATURE)
 security_feature_data %&gt;% head()</code></pre>
@@ -365,17 +332,8 @@ security_feature_data %&gt;% head()</code></pre>
 ## 6        4      2        2      2      2       2          0         0      1</code></pre>
 <pre class="r"><code>#Logistic regression on security features
 #Logistic regression
-#FEATURE excluded</code></pre>
-<p>We discuss the impact of third-party certification on the WTP for security features below with the analysis of security features only. We separate the analyses because variables such as third-party certification, risk perceptions and attitudes, self-confidence, etc., are expected to influence an individual’s WTP for security features only.</p>
-<p>To focus on the effects of the third-party certification as well as risk perceptions of individuals on the WTP for security, equation for logistic regression is modified (as shown below) to apply to security features (FEATURE is removed). Here, FEATURE is no longer needed.</p>
-<pre class="r"><code>exp(coef(model))</code></pre>
-<pre><code>## (Intercept)     FEATURE     THPARTY     PROFFER     ORDPREF     RISKBEH 
-##   0.5959341   2.3131189   0.9626695   1.0019312   1.0905547   1.0009689 
-##    RISKPERC    LSLFCONF      MOBBEH      OWNEXP      OTHEXP     HEAREXP 
-##   1.0031441   0.9642825   1.0014450   1.0117356   0.9882403   0.9941010 
-##         AGE      INCOME      GENDER  HomeExpDum   MedRecDum 
-##   1.0029723   1.0000000   1.0052888   0.9942375   0.9450879</code></pre>
-<pre class="r"><code>model_security &lt;- glm(WTP ~ + THPARTY + PROFFER + ORDPREF + 
+#FEATURE excluded
+model_security &lt;- glm(WTP ~ + THPARTY + PROFFER + ORDPREF + 
                       RISKBEH + RISKPERC + LSLFCONF + MOBBEH + 
                       OWNEXP + OTHEXP + HEAREXP + AGE + INCOME + 
                       GENDER + HomeExpDum + MedRecDum, 
@@ -420,7 +378,195 @@ security_feature_data %&gt;% head()</code></pre>
 ## AIC: 9451.8
 ## 
 ## Number of Fisher Scoring iterations: 4</code></pre>
-<p>The estimates for the binary logit model are shown above for only Security Features. First, the results show that THPARTY (THPARTY = NO was used as the reference category) is NOT significant, which indicates that third-party certification did NOT increase the WTP for security (H2 is NOT supported).</p>
+<p><em>H2: Users of mobile applications are more willing to pay for security features when the features are verified by a third party than when the features are not verified by a third party</em></p>
+<p>The estimates for the binary logit model are shown above for only Security Features. First, the results show that THPARTY (THPARTY = NO was used as the reference category) is <em>NOT</em> significant, which indicates that third-party certification did NOT increase the WTP for security (H2 is <em>NOT</em> supported).</p>
+<pre class="r"><code>exp(coef(model_security))</code></pre>
+<pre><code>## (Intercept)     THPARTY     PROFFER     ORDPREF     RISKBEH    RISKPERC 
+##   1.1705635   1.0110129   1.0318644   1.1190175   0.9984177   1.0137411 
+##    LSLFCONF      MOBBEH      OWNEXP      OTHEXP     HEAREXP         AGE 
+##   0.9525955   0.9974471   1.0150819   0.9917766   1.0122153   1.0041431 
+##      INCOME      GENDER  HomeExpDum   MedRecDum 
+##   1.0000000   1.0408425   0.9335563   0.9283185</code></pre>
+<p>Here are the default rules for constructing the reference grid</p>
+<ol style="list-style-type: decimal">
+<li>For each predictor that is a factor, use its levels (dropping unused ones)</li>
+<li>For each numeric predictor (covariate), use its average.</li>
+</ol>
+<pre class="r"><code>ref_grid(model)</code></pre>
+<pre><code>## &#39;emmGrid&#39; object with variables:
+##     FEATURE = 0, 1
+##     THPARTY = 0, 1
+##     PROFFER = 1.6214
+##     ORDPREF = 0, 1
+##     RISKBEH = 3.981
+##     RISKPERC = 3.9466
+##     LSLFCONF = 1.9707
+##     MOBBEH = 4.0155
+##     OWNEXP = 2.0259
+##     OTHEXP = 1.9655
+##     HEAREXP = 2.0103
+##     AGE = 40.817
+##     INCOME = 92075
+##     GENDER = 0, 1
+##     HomeExpDum = 0, 1
+##     MedRecDum = 0, 1
+## Transformation: &quot;logit&quot;</code></pre>
+<p>H3: Users of mobile applications are less or similarly willing to pay for usability features than for security features when the security features are verified by a third party.</p>
+<p>To test whether the verification of security features by a third party succeeds in eliminating the difference in WTP between usability and security features (H3), we relied on the earlier results (for all features) to contrast the log odds for the likelihood of paying for a third party verified security feature versus paying for a usability feature that is either seller verified or third-party verified.</p>
+<p>The log odds for the latter option (i.e., a usability feature that is either seller verified or third-party verified) is the log of the sum of its likelihoods of paying for the seller-verified and third-party verified versions. In other words, the sum of log odds of a seller-verified usability feature and a third-party verified usability feature is:</p>
+<pre><code>                            𝑎1 − 𝑎2 + 𝑎1 + 𝑎2 = 2𝑎1
+                            </code></pre>
+<p>Then, the difference (D) between the log odds of a third-party verified security feature (−𝑎1 − 𝑎2) versus a usability feature (computed above) is:</p>
+<pre><code>                          𝐷 = −𝑎1 − 𝑎2 − 2𝑎1 = −3𝑎1 − 𝑎2</code></pre>
+<p>This approach to testing H3 is needed because H3 concerns the impact on WTP of third-party certification of a security feature versus seller certification of either a usability or a security feature, rather than merely the impact of THPARTY on WTP.</p>
+<p>The below code gives all pairwise comparisons, for all the combinations of Third Party and Features (Usability, Security)</p>
+<p>If the difference (D), is positive and significant, it implies support for H3, otherwise it doesn’t.</p>
+<p>Estimated Marginal Means (EMMs) are model-dependent. The emmeans function computes EMMs, accompanied by standard errors and confidence intervals.</p>
+<p>In the below examples, we use emmeans() to do all pairwise comparisons for all combinations of ‘’FEATURE’ and ‘THPARTY’.</p>
+<pre class="r"><code>model.emm = emmeans(model, ~ FEATURE * THPARTY )
+model.emm</code></pre>
+<pre><code>##  FEATURE THPARTY emmean     SE  df asymp.LCL asymp.UCL
+##        0       0 -0.438 0.0327 Inf    -0.502    -0.374
+##        1       0  0.400 0.0326 Inf     0.336     0.464
+##        0       1 -0.476 0.0328 Inf    -0.541    -0.412
+##        1       1  0.362 0.0325 Inf     0.299     0.426
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the logit (not the response) scale. 
+## Confidence level used: 0.95</code></pre>
+<pre class="r"><code>#Alternatively, above code can be written as follows:
+model.emm1 = emmeans(model, ~ FEATURE : THPARTY )
+model.emm1</code></pre>
+<pre><code>##  FEATURE THPARTY emmean     SE  df asymp.LCL asymp.UCL
+##        0       0 -0.438 0.0327 Inf    -0.502    -0.374
+##        1       0  0.400 0.0326 Inf     0.336     0.464
+##        0       1 -0.476 0.0328 Inf    -0.541    -0.412
+##        1       1  0.362 0.0325 Inf     0.299     0.426
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the logit (not the response) scale. 
+## Confidence level used: 0.95</code></pre>
+<p>One way to use emmeans() is via formula coding for the comparisons. The formula is defined in the specs argument.</p>
+<pre class="r"><code>model.emm2 = emmeans(model, specs = pairwise ~ FEATURE : THPARTY )
+model.emm2</code></pre>
+<pre><code>## $emmeans
+##  FEATURE THPARTY emmean     SE  df asymp.LCL asymp.UCL
+##        0       0 -0.438 0.0327 Inf    -0.502    -0.374
+##        1       0  0.400 0.0326 Inf     0.336     0.464
+##        0       1 -0.476 0.0328 Inf    -0.541    -0.412
+##        1       1  0.362 0.0325 Inf     0.299     0.426
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the logit (not the response) scale. 
+## Confidence level used: 0.95 
+## 
+## $contrasts
+##  contrast  estimate     SE  df z.ratio p.value
+##  0 0 - 1 0   -0.839 0.0347 Inf -24.180  &lt;.0001
+##  0 0 - 0 1    0.038 0.0347 Inf   1.096  0.6918
+##  0 0 - 1 1   -0.801 0.0490 Inf -16.338  &lt;.0001
+##  1 0 - 0 1    0.877 0.0491 Inf  17.845  &lt;.0001
+##  1 0 - 1 1    0.038 0.0347 Inf   1.096  0.6918
+##  0 1 - 1 1   -0.839 0.0347 Inf -24.180  &lt;.0001
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the log odds ratio (not the response) scale. 
+## P value adjustment: tukey method for comparing a family of 4 estimates</code></pre>
+<p>The above formula returns an object with two parts</p>
+<p>The first part, called emmeans, gives the estimated marginal means along with the standard errors and confidence intervals. You can also view the output using the below command</p>
+<pre class="r"><code>model.emm2$emmeans</code></pre>
+<pre><code>##  FEATURE THPARTY emmean     SE  df asymp.LCL asymp.UCL
+##        0       0 -0.438 0.0327 Inf    -0.502    -0.374
+##        1       0  0.400 0.0326 Inf     0.336     0.464
+##        0       1 -0.476 0.0328 Inf    -0.541    -0.412
+##        1       1  0.362 0.0325 Inf     0.299     0.426
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the logit (not the response) scale. 
+## Confidence level used: 0.95</code></pre>
+<p>The second part of the output, called contrasts, contains the comparisons of interest.</p>
+<pre class="r"><code>model.emm2$contrasts</code></pre>
+<pre><code>##  contrast  estimate     SE  df z.ratio p.value
+##  0 0 - 1 0   -0.839 0.0347 Inf -24.180  &lt;.0001
+##  0 0 - 0 1    0.038 0.0347 Inf   1.096  0.6918
+##  0 0 - 1 1   -0.801 0.0490 Inf -16.338  &lt;.0001
+##  1 0 - 0 1    0.877 0.0491 Inf  17.845  &lt;.0001
+##  1 0 - 1 1    0.038 0.0347 Inf   1.096  0.6918
+##  0 1 - 1 1   -0.839 0.0347 Inf -24.180  &lt;.0001
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the log odds ratio (not the response) scale. 
+## P value adjustment: tukey method for comparing a family of 4 estimates</code></pre>
+<pre class="r"><code>model.emm2$contrasts %&gt;%
+     confint()</code></pre>
+<pre><code>##  contrast  estimate     SE  df asymp.LCL asymp.UCL
+##  0 0 - 1 0   -0.839 0.0347 Inf   -0.9277    -0.749
+##  0 0 - 0 1    0.038 0.0347 Inf   -0.0511     0.127
+##  0 0 - 1 1   -0.801 0.0490 Inf   -0.9264    -0.675
+##  1 0 - 0 1    0.877 0.0491 Inf    0.7504     1.003
+##  1 0 - 1 1    0.038 0.0347 Inf   -0.0511     0.127
+##  0 1 - 1 1   -0.839 0.0347 Inf   -0.9277    -0.749
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the log odds ratio (not the response) scale. 
+## Confidence level used: 0.95 
+## Conf-level adjustment: tukey method for comparing a family of 4 estimates</code></pre>
+<p>The above function reports confidence intervals for comparison of interest. The ‘confint()’ function returns confidence intervals but gets rid of the statistical tests. To report the test statistics and p-values, we can use the summary() function instead of ‘confint()’ as shown below</p>
+<pre class="r"><code>model.emm2$contrasts %&gt;%
+     summary(infer = TRUE)</code></pre>
+<pre><code>##  contrast  estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  0 0 - 1 0   -0.839 0.0347 Inf   -0.9277    -0.749 -24.180  &lt;.0001
+##  0 0 - 0 1    0.038 0.0347 Inf   -0.0511     0.127   1.096  0.6918
+##  0 0 - 1 1   -0.801 0.0490 Inf   -0.9264    -0.675 -16.338  &lt;.0001
+##  1 0 - 0 1    0.877 0.0491 Inf    0.7504     1.003  17.845  &lt;.0001
+##  1 0 - 1 1    0.038 0.0347 Inf   -0.0511     0.127   1.096  0.6918
+##  0 1 - 1 1   -0.839 0.0347 Inf   -0.9277    -0.749 -24.180  &lt;.0001
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the log odds ratio (not the response) scale. 
+## Confidence level used: 0.95 
+## Conf-level adjustment: tukey method for comparing a family of 4 estimates 
+## P value adjustment: tukey method for comparing a family of 4 estimates</code></pre>
+<p>Within group comparisons: Can be used if you want a specific set of comparison rather than pairwise comparisons. For example, FEATURE | THPARTY, compares levels of FEATURE for each level of THPARTY</p>
+<pre class="r"><code>model.emm3 = emmeans(model, specs = pairwise ~ FEATURE | THPARTY )
+model.emm3</code></pre>
+<pre><code>## $emmeans
+## THPARTY = 0:
+##  FEATURE emmean     SE  df asymp.LCL asymp.UCL
+##        0 -0.438 0.0327 Inf    -0.502    -0.374
+##        1  0.400 0.0326 Inf     0.336     0.464
+## 
+## THPARTY = 1:
+##  FEATURE emmean     SE  df asymp.LCL asymp.UCL
+##        0 -0.476 0.0328 Inf    -0.541    -0.412
+##        1  0.362 0.0325 Inf     0.299     0.426
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the logit (not the response) scale. 
+## Confidence level used: 0.95 
+## 
+## $contrasts
+## THPARTY = 0:
+##  contrast estimate     SE  df z.ratio p.value
+##  0 - 1      -0.839 0.0347 Inf -24.180  &lt;.0001
+## 
+## THPARTY = 1:
+##  contrast estimate     SE  df z.ratio p.value
+##  0 - 1      -0.839 0.0347 Inf -24.180  &lt;.0001
+## 
+## Results are averaged over the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the log odds ratio (not the response) scale.</code></pre>
+<pre class="r"><code>model.emm3$contrasts %&gt;%
+     rbind()</code></pre>
+<pre><code>##  THPARTY contrast estimate     SE  df z.ratio p.value
+##  0       0 - 1      -0.839 0.0347 Inf -24.180  &lt;.0001
+##  1       0 - 1      -0.839 0.0347 Inf -24.180  &lt;.0001
+## 
+## Results are averaged over some or all of the levels of: ORDPREF, GENDER, HomeExpDum, MedRecDum 
+## Results are given on the log odds ratio (not the response) scale. 
+## P value adjustment: bonferroni method for 2 tests</code></pre>
+<p>H4: The willingness to pay for security features by users of mobile applications negatively correlates with individuals’ risk-taking attitudes.</p>
+<p>The results of security features show that ‘RISKBEH’ is <em>NOT</em> significantly associated with the likelihood of paying for security.</p>
 </div>
 
 

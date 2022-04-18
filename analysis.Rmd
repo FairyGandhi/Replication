@@ -13,27 +13,28 @@ knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
 library(rmarkdown)
 library(dplyr)
+install.packages("emmeans")
+install.packages("magrittr")
+library(emmeans)
+library(magrittr)
 ```
 
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r data upload}
 data <- read.csv("C:\\Users\\fairy\\Desktop\\Replication\\Final_data_hypothesis_testing.csv")
 head(data)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
 
 ```{r }
 str(data)
 ```
+
+Logistic Regression is a Machine Learning classification algorithm that is used to predict the probability of a categorical dependent variable. It is an extension of the linear regression model for classification problems.
+
 ```{r logistic regression}
 model <- glm(WTP ~ FEATURE + THPARTY + PROFFER + ORDPREF + 
                    RISKBEH + RISKPERC + LSLFCONF + MOBBEH + 
@@ -42,6 +43,8 @@ model <- glm(WTP ~ FEATURE + THPARTY + PROFFER + ORDPREF +
                    data = data, family = "binomial")
 summary(model)
 ```
+*H1: Users of mobile applications are more willing to pay for usability features than for security features*
+
 The estimates for the binary logit model are shown above for All Features. First, the results show that the estimate of the log odds of FEATURE = Security (since Usability is the reference group) is positive (0.836) and significant (p < 0.001) implying that the respondents were significantly more willing to pay for a security feature compared to a usability feature (H1 is *NOT* supported).
 
 Because the estimates (above) measure log odds of WTP = 1 for the binary variable FEATURE, the odds ratio for the WTP for a Security feature versus WTP for a Usability feature can be computed from the estimate. The estimate is +0.836, from which we can calculate the odds ratio to be 2.3131189, implying that an individual is about 83% more likely to be willing to pay for security than for usability. Thus, we do *not* find strong support for our hypotheses that mobile app users are more willing to pay for usability features than for security features.
@@ -79,8 +82,101 @@ model_security <- glm(WTP ~ + THPARTY + PROFFER + ORDPREF +
 ```{r }
 summary(model_security)
 ```
+*H2: Users of mobile applications are more willing to pay for security features when the features are verified by a third party than when the features are not verified by a third party* 
+
 The estimates for the binary logit model are shown above for only Security Features. First, the results show that THPARTY (THPARTY = NO was used as the reference category) is *NOT* significant, which indicates that third-party certification did NOT increase the WTP for security (H2 is *NOT* supported).
 
 ```{r}
 exp(coef(model_security))
 ```
+Here are the default rules for constructing the reference grid
+
+1. For each predictor that is a factor, use its levels (dropping unused ones)
+2. For each numeric predictor (covariate), use its average.
+
+```{r}
+ref_grid(model)
+```
+
+
+H3: Users of mobile applications are less or similarly willing to pay for usability features than for security features when the security features are verified by a third party.
+
+To test whether the verification of security features by a third party succeeds in eliminating the difference in WTP between usability and security features (H3), we relied on the earlier results (for all features) to contrast the log odds for the likelihood of paying for a third party verified security feature versus paying for a usability feature that is either seller verified or third-party verified.
+
+The log odds for the latter option (i.e., a usability feature that is either seller verified or third-party verified) is the log of the sum of its likelihoods of paying for the seller-verified and third-party verified versions. In other words, the sum of log odds of a seller-verified usability feature and a third-party verified usability feature is:
+
+                                𝑎1 − 𝑎2 + 𝑎1 + 𝑎2 = 2𝑎1
+                                
+Then, the difference (D) between the log odds of a third-party verified security feature (−𝑎1 − 𝑎2) versus a usability feature (computed above) is:
+
+                              𝐷 = −𝑎1 − 𝑎2 − 2𝑎1 = −3𝑎1 − 𝑎2
+
+This approach to testing H3 is needed because H3 concerns the impact on WTP of third-party certification of a security feature versus seller certification of either a usability or a security feature, rather than merely the impact of THPARTY on WTP.
+
+The below code gives all pairwise comparisons, for all the combinations of Third Party and Features (Usability, Security)
+
+If the difference (D), is positive and significant, it implies support for H3, otherwise it doesn't.
+
+Estimated Marginal Means (EMMs) are model-dependent. The emmeans function computes EMMs, accompanied by standard errors and confidence intervals. 
+
+In the below examples, we use emmeans() to do all pairwise comparisons for all combinations of ''FEATURE' and 'THPARTY'.
+
+```{r}
+model.emm = emmeans(model, ~ FEATURE * THPARTY )
+model.emm
+```
+
+```{r}
+#Alternatively, above code can be written as follows:
+model.emm1 = emmeans(model, ~ FEATURE : THPARTY )
+model.emm1
+```
+
+One way to use emmeans() is via formula coding for the comparisons. The formula is defined in the specs argument.
+
+```{r}
+model.emm2 = emmeans(model, specs = pairwise ~ FEATURE : THPARTY )
+model.emm2
+```
+The above formula returns an object with two parts
+
+The first part, called emmeans, gives the estimated marginal means along with the standard errors and confidence intervals. You can also view the output using the below command
+
+```{r}
+model.emm2$emmeans
+```
+The second part of the output, called contrasts, contains the comparisons of interest.
+
+```{r}
+model.emm2$contrasts
+```
+```{r}
+model.emm2$contrasts %>%
+     confint()
+```
+The above function reports confidence intervals for comparison of interest. The 'confint()' function returns confidence intervals but gets rid of the statistical tests. 
+To report the test statistics and p-values, we can use the summary() function instead of 'confint()' as shown below
+
+```{r}
+model.emm2$contrasts %>%
+     summary(infer = TRUE)
+```
+
+Within group comparisons: Can be used if you want a specific set of comparison rather than pairwise comparisons.
+For example, FEATURE | THPARTY, compares levels of FEATURE for each level of THPARTY
+
+```{r}
+model.emm3 = emmeans(model, specs = pairwise ~ FEATURE | THPARTY )
+model.emm3
+```
+
+```{r}
+model.emm3$contrasts %>%
+     rbind()
+```
+
+
+H4: The willingness to pay for security features by users of mobile applications negatively correlates with individuals' risk-taking attitudes.
+
+The results of security features show that 'RISKBEH' is *NOT* significantly associated with the likelihood of paying for security.
+
