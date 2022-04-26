@@ -13,10 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
 library(rmarkdown)
 library(dplyr)
-install.packages("emmeans")
-install.packages("magrittr")
 library(emmeans)
-library(magrittr)
 ```
 
 
@@ -24,7 +21,7 @@ library(magrittr)
 
 
 ```{r data upload}
-data <- read.csv("C:\\Users\\fairy\\Desktop\\Replication\\Final_data_hypothesis_testing.csv")
+data <- read.csv("Final_data_hypothesis_testing.csv")
 head(data)
 ```
 
@@ -174,6 +171,27 @@ model.emm3
 model.emm3$contrasts %>%
      rbind()
 ```
+
+Coefficients for our emmeans model:
+```{r}
+model.emm
+```
+
+
+```{r}
+contrast(model.emm,
+         list(h3 = c(-1/2, 0, -1/2, 1)))
+```
+## H3 -- recoded
+
+```{r}
+
+
+```
+
+
+
+# H4
 
 
 H4: The willingness to pay for security features by users of mobile applications negatively correlates with individuals' risk-taking attitudes.
